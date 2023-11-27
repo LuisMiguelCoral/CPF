@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Last 2 Digits CPF</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="jquery-3.7.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
+  </head>
+  <body class="flex flex-col items-center min-h-screen mt-32">
+    <h1 class="text-3xl text-slate-700 font-bold mb-8">
+      Calculadora de Dígitos do CPF
+    </h1>
+    <div id="cpf" class="flex flex-col justify-center relative mb-3 w-[25%]">
+      <label
+        for="cpf-input"
+        class="block mb-2 text-sm font-medium text-center text-gray-900 dark:text-white mb-2"
+        >Digite os primeiros 9 digitos do seu CPF:</label
+      >
+      <input
+        type="text"
+        id="cpf-input"
+        maxlength="9"
+        oninput="calculateDigits()"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        placeholder=""
+        required
+      />
+    </div>
+    <div id="result"></div>
+    <div id="cpf-complete"></div>
+
+    <script>
+      var options = {
+        onKeyPress: function (cpf, ev, el, op) {
+          var masks = ["000.000.000-XX"];
+          $("#cpf-input").mask(cpf.length > 7 ? masks[1] : masks[0], op);
+        },
+      };
+
+      $("#cpf-input").length < 7
+        ? $("#cpf-input").mask("000.000.000-XX", options)
+        : "";
+
+      function calculateDigits() {
+        if ($("#cpf-input").val().lenght >= 9) {
+          document.getElementById("result").innerText = "Calculando...";
+        }
+
+        var jq = document.createElement("script");
+        jq.src =
+          "https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js";
+        document.getElementsByTagName("head")[0].appendChild(jq);
+        function frame() {
+          confetti({
+            particleCount: 135,
+            angle: 60,
+            spread: 200,
+            origin: {
+              x: 0,
+            },
+          });
+
+          confetti({
+            particleCount: 135,
+            angle: 120,
+            spread: 55,
+            origin: {
+              x: 1,
+            },
+          });
+        }
+
+        setTimeout(function () {
+          var cpf = document
+            .getElementById("cpf-input")
+            .value.replace(/[^\d]+/g, "");
+          if (cpf.length != 9) {
+            document.getElementById("result").innerText = "";
+            document.getElementById("cpf-complete").innerText = "";
+            return;
+          }
+
+          var sum = 0;
+          for (var i = 0; i < 9; i++) {
+            sum += cpf[i] * (10 - i);
+          }
+
+          var firstDigit = sum % 11 < 2 ? 0 : 11 - (sum % 11);
+
+          sum = 0;
+          for (var i = 0; i < 9; i++) {
+            sum += cpf[i] * (11 - i);
+          }
+          sum += firstDigit * 2;
+
+          var secondDigit = sum % 11 < 2 ? 0 : 11 - (sum % 11);
+
+          document.getElementById("result").innerText = "";
+
+          document.getElementById("result").innerText =
+            "Os últimos dois dígitos do seu CPF são: " +
+            firstDigit +
+            secondDigit;
+          document.getElementById("cpf-complete").innerText =
+            "CPF completo: " +
+            cpf.replace(/(\d{3})(\d{3})(\d{3})/, "$1.$2.$3") +
+            "-" +
+            firstDigit +
+            secondDigit;
+          frame();
+        }, 2000);
+      }
+    </script>
+  </body>
+</html>
